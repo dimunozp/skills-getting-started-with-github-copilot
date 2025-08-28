@@ -97,18 +97,34 @@ section h3 {
 
 .participants-list li {
   margin-bottom: 6px;
-  padding-left: 22px;
+  padding-left: 0;
   position: relative;
   font-size: 15px;
   color: #333;
+  display: flex;
+  align-items: center;
 }
 
 .participants-list li::before {
-  content: "👤";
-  position: absolute;
-  left: 0;
-  top: 0;
-  font-size: 16px;
+  content: "";
+  display: none;
+}
+
+.delete-participant-btn {
+  background: none;
+  border: none;
+  color: #c62828;
+  font-size: 18px;
+  margin-left: 8px;
+  cursor: pointer;
+  transition: color 0.2s;
+  padding: 0 4px;
+  border-radius: 3px;
+}
+
+.delete-participant-btn:hover {
+  color: #b71c1c;
+  background-color: #ffebee;
 }
 
 .form-group {

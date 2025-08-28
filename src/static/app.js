@@ -4,6 +4,35 @@ document.addEventListener("DOMContentLoaded", () => {
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
 
+  // Unregister participant from activity
+  async function unregisterParticipant(activity, email) {
+    try {
+      const response = await fetch(
+        `/activities/${encodeURIComponent(activity)}/unregister?email=${encodeURIComponent(email)}`,
+        { method: "POST" }
+      );
+      const result = await response.json();
+      if (response.ok) {
+        showMessage(result.message, "success");
+        fetchActivities();
+      } else {
+        showMessage(result.detail || "Error al eliminar participante", "error");
+      }
+    } catch (error) {
+      showMessage("No se pudo eliminar el participante.", "error");
+      console.error("Error unregistering participant:", error);
+    }
+  }
+
+  function showMessage(text, type) {
+    messageDiv.textContent = text;
+    messageDiv.className = type;
+    messageDiv.classList.remove("hidden");
+    setTimeout(() => {
+      messageDiv.classList.add("hidden");
+    }, 5000);
+  }
+
   // Function to fetch activities from API
   async function fetchActivities() {
     try {
@@ -28,7 +57,11 @@ document.addEventListener("DOMContentLoaded", () => {
               ${
                 details.participants.length > 0
                   ? details.participants.map(
-                      (p) => `<li>${p}</li>`
+                      (p) =>
+                        `<li>
+                          <span>${p}</span>
+                          <button class="delete-participant-btn" title="Eliminar" data-activity="${name}" data-email="${p}">🗑️</button>
+                        </li>`
                     ).join("")
                   : `<li style="color:#888;">Nadie inscrito aún</li>`
               }
@@ -51,6 +84,15 @@ document.addEventListener("DOMContentLoaded", () => {
         option.value = name;
         option.textContent = name;
         activitySelect.appendChild(option);
+      });
+
+      // Add event listeners for delete buttons
+      document.querySelectorAll(".delete-participant-btn").forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const activity = btn.getAttribute("data-activity");
+          const email = btn.getAttribute("data-email");
+          unregisterParticipant(activity, email);
+        });
       });
     } catch (error) {
       activitiesList.innerHTML = "<p>Failed to load activities. Please try again later.</p>";
